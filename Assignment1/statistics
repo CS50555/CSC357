@@ -1,0 +1,217 @@
+#!/bin/bash
+#Assignment 1
+# In this assignment, the statistics program takes in two paramiters (either -r or -c) for rows and columns,
+# and calculates the mean and median of the rows and columns of a block of numbers
+
+##################################INITIALIZATION#################
+
+
+operation=$1			#operation determines whether it is a row or column operation and olds that parameter
+filename=$2			#filename is holds the name of the file run by statistics
+paramnum=$#			#paramnum is the number of arguments
+total=0  			#total for averaging the numbers
+accum=0  			#accumulator for finding how many rows/cols there are ( how many digits allowed in each number)
+
+#Initialze the temporary files I am going to use
+echo "" > $$transposed		
+echo "" > $$colsplicer
+echo "" > $$outputfile
+echo "" > $$numbernewlinefile
+echo "" > $$sortednums
+echo "" > $$colsoutput
+echo "" > $$untabbedfile
+echo "" > $$transposed
+
+#trap any exit signals and remove all temporary files if an exit signal (such as Ctrl C) is pressed mid process
+trap "rm -f $$colsoutput $$colsplicer $$numbernewlinefile $$outputfile $$sortednums $$transposed $$untabbedfile" EXIT
+
+#Initialize the arrays I will use for averaging and finding the median numbers
+colavgs=()		#Array that holds the average for each column
+colmeds=()		#Array that holds the median for each column
+sortednumsarray=()	#Array that contains the sorted numbers of each row/column
+
+################## ERROR HANDLING ##########################
+#If there is less than two parameters (Missing the filename) ask for standard input from the user
+#If there are more than two parameters, send an error signal and tell the user the correct command format
+if [ "$paramnum" -lt 2 ]
+then
+   echo $(cat)
+elif [ "$paramnum" -gt 2 ] 
+then
+  echo "Usage: statistics {rows|cols} [file]" 1>&2
+  exit 1
+fi
+
+# If the first letter is an "r", do a row operation, if the first letter is a "c" do a column operation
+# If doing a row operation, set rows variable to 1 and columns to 0 and vice versa
+if echo "$operation" | grep -q "r"  #this command inputs the operation flag into grep, which searches for the first letter and checks if 'r' in flag 
+then
+  rows=1
+  columns=0
+elif  echo "$operation" | grep -q "c" #this command does the same thing as the one above but instead checks if 'c' in flag
+then
+  rows=0				#I am setting these rows and columns variables as 0s and 1s flags to determine whether a row or column was inputted as the operation from the user
+  columns=1
+else 
+  echo "Usage: statistics {rows|cols} [file]" 1>&2	#if the user put anything except 'r' or 'c', give them an error message with the correct flags
+  exit 1
+fi
+
+#Check if the file exists and is readable and if it does not exist/is not readable, give an error message
+if [ ! -r $filename ]		#this checks whether or not a file is readable
+then
+	echo "cannot read file: $filename" 1>&2
+	exit 1
+fi
+
+if [ ! -f $filename ]	#this checks whether or not this file is both readable and exists in the current directory
+then
+  echo "Statistics: Cannot Read $filename" 1>&2
+  exit 1
+fi
+
+####################### COLUMNS #########################
+# First transpose the columns and rows to reuse algorithm for finding mean and median in rows for column operation
+# Loop through each column in the file and take the median and mean of each column, then print those results in an output file
+if [ $columns -eq 1 ]		#Check if user specified a column operation
+then
+###################################TRANSPOSE NUMBERS (EXPECTING TABS)###########################################
+     cat $filename | tr "\t" " " > $$untabbedfile	#Replace all of the tabs with spaces and output to untabbed file
+     	i=1						#set dummy variable for accumulation to see how many columns there are
+	while read line					# Loop through file and read each line (read each column)
+	do									
+				
+       		tr -s ' ' < $$untabbedfile | cut -d " " -f$i > $$colsplicer	#squeeze multiple spaces into ones space and cut each column to isolate it per each iteration, then print those columns as rows in colsplicer
+		
+		#Depending on if first iteration or not, replace/append columns, replacing newlines with spaces to make them rows
+		
+		if [ $i -eq 1 ]	
+		then
+  			tr '\n' ' ' < $$colsplicer > $$transposed  #replace newlines with spaces to turn columns into rows
+		else
+      			tr '\n' ' ' < $$colsplicer >> $$transposed
+    		fi
+    		echo "" >> $$transposed	#create new line in transposed file for next row (created from next column)
+    	        i=$((i+1))  		#iterate dummy variable
+        	
+	done < $$untabbedfile
+	
+	sed -i '${/^ *$/d}' "$$transposed"  #This command checks if the last line is a newline with whitespace only so that a divide by zero error does not occur
+					    #{} ensures the command is applied only to the last line, ^ *$ matches lines with whitespace and d deletes those lines
+
+################################################################## FINISH TRANSPOSE ##############################################################
+ 	#In this while loop, I am iterating through the lines of the file, sorting them to find the median, and adding them to find the mean (for each column
+
+	while read line
+        do
+
+                echo "" > $$numbernewlinefile	#initialize these two files to use as temporary files for printing and median work
+                echo "" > $$sortednums
+                for num in $line
+                do
+		        accum=$((accum + 1))		#accumulate for each number in the column
+                        total=$((total + num))		#accumulate the total for averaging
+                        echo $num >> $$numbernewlinefile
+			sortednumsarray+=($num)                                    #input the numbers into tempfile2
+                done
+	
+		sortednumsarray=($(echo "${sortednumsarray[@]}" | tr ' ' '\n' | sort -n))	#output all of the elements in sortednumsarray, replaceing all spaces with newlines, and sorting those elements as they are a column (basically turns the row of elements into a column so they are sortable with the sort function
+		sortednumsarraylength=$(echo ${#sortednumsarray[@]})  #numbersign means length; find the length of array  (amount of numbers) and store in this variable	
+
+                if [ $((wordcount % 2)) -eq 0 ]		#if the amount of numbers is even (modulo == 0), the index of the median is the element halfway + 1 (or just halfway since the array is 0 indexed), if the amount of numbers is odd, add one to get the middle number since it will not round up automatically
+                then
+                        medianidx=$(( sortednumsarraylength / 2 ))
+                else
+                        medianidx=$(( sortednumsarraylength / 2 + 1))
+                fi
+
+		median=${sortednumsarray[medianidx]}		#create a variable median to hold the value at the median index in the sorted array
+                sortednumsarray=()				#clear the array for next iteration
+                #echo "accum: $accum"
+		avg=$((total/accum)) #calculate the average scale by 2 to make it easier to see what the remainder is and if we should round up
+
+		if [ $(( total % accum )) -ge $(( accum / 2 )) ] && [ $(( accum % 2 )) -eq 0 ]  #see if the remainder is greater than half of the denominator to see if the average needs to be changed/rounded up
+                then
+                      avg=$(( avg + 1 ))		#Round up
+                elif [ $(( total % accum )) -ge $(( accum / 2 + 1 )) ] && [ $(( accum % 2 )) -ne 0 ] #if accum is odd, we need to add one to account for 0.5 w remainter (ex: 5/2 = 2.5, so you must have at least remainder of 2.5 (or 3 since we are only using ints, so add one to accum / 2)
+                then
+                      avg=$(( avg + 1 ))		#Round up
+                fi
+		
+		colavgs+=($avg)				#add the average of the column to the array column avgs
+                colavgs+=("      ")			#add a tab for spacing in the output
+		colmeds+=($median)			#add the median of the column to the array column median
+		colmeds+=("      ")			#add a tab for spaceing in the output
+                total=0  				#reset total variable
+                wordcount=0  				#resets wordcount variable
+                accum=0  				#reset accumulator variable
+	
+       done < $$transposed
+
+	echo "Averages:" > $$colsoutput			#print "averages" into the temp output file
+	echo "${colavgs[*]}" >> $$colsoutput		#print the array of averages into the temp output file
+	echo "Medians:" >> $$colsoutput			#print "medians into the temp output file
+	echo "${colmeds[*]}" >> $$colsoutput		#print the array of meidans into the temp output file
+	cat $$colsoutput				#print the contents of the output file
+
+############################################# ROWS ########################################
+#The rows seciton of the conditional uses the same algorithm as the columsn, but you do not transpose the matrix of data in beforehand, so i will only comment on new/complicated commands/lines
+#If I had more time, I would only have the algorithm code written once, and use conditionals for the operation used
+elif [ "$rows" -eq 1 ]
+then
+	echo "Average Median" > $$outputfile		#echo "Average Median" into rows output file for presentation of output
+	while read line
+	do
+
+    		echo "" > $$numbernewlinefile
+    		echo "" > $$sortednums
+		
+		#Same deal here... iterate through the rows of numbers and find the mean and median of each row then print them out
+    		for num in $line
+    		do
+      			accum=$((accum + 1))
+      			total=$((total + num))
+      			echo $num >> $$numbernewlinefile                                    #input the numbers into tempfile2
+ 			sortednumsarray+=($num)                                    
+    		done
+    
+		sortednumsarray=($(echo "${sortednumsarray[@]}" | tr ' ' '\n' | sort -n))	#output all of the elements in sortednumsarray, replaceing all spaces with newlines, and sorting those elements as they are a column (basically turns the row of elements into a column so they are sortable with the sort function
+                sortednumsarraylength=$(echo ${#sortednumsarray[@]})  				#numbersign means length; find the length of the array and store in this variable
+		#if there is an even amount of numbers, divide by two to find the upper middle ( median ) index, if odd, add one to account for rounding wiht 0.5
+                if [ $((wordcount % 2)) -eq 0 ]
+                then
+                        medianidx=$(( sortednumsarraylength / 2 ))
+                else
+                        medianidx=$(( sortednumsarraylength / 2 + 1))
+                fi
+		
+		median=${sortednumsarray[medianidx]}		#the value at the index of median in sorted list is stored as the median
+                sortednumsarray=()				#clear the array for next iteration
+                avg=$((total/accum)) 				#calculate the average scale by 2 to make it easier to see what the remainder is and if we should round up   		
+
+		if [ $(( total % accum )) -ge $(( accum / 2 )) ] && [ $(( accum % 2 )) -eq 0 ]  #see if the remainder is greater than half of the denominator to see if the average needs to be changed/rounded up
+    		then
+        		avg=$(( avg + 1 ))
+    		elif [ $(( total % accum )) -ge $(( accum / 2 + 1 )) ] && [ $(( accum % 2 )) -ne 0 ] #if accum is odd, we need to add one to account for 0.5 w remainter (ex: 5/2 = 2.5, so you must have at least remainder of 2.5 (or 3 since we are only using ints, so add one to accum / 2)
+		then
+			avg=$(( avg + 1 )) 
+		fi   
+    		echo "$avg       $median" >> $$outputfile	#print the columns of averages and medians into the output file
+    		total=0  	#reset total variable
+    		wordcount=0     #resets wordcount variable
+    		accum=0  	#reset accumulator variable
+                
+	done < "$filename"
+	
+	cat $$outputfile	#print the output file contents for user to see
+fi
+
+###################### CLEANING UP temp files #####################################
+rm $$transposed
+rm $$colsplicer
+rm $$outputfile
+rm $$numbernewlinefile
+rm $$sortednums
+rm $$colsoutput
+rm $$untabbedfile
+
