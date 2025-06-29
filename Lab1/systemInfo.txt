@@ -1,0 +1,58 @@
+Time and Date
+48:03 PST 2025
+
+CPU Info
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 85
+model name	: Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz
+stepping	: 7
+microcode	: 0x5003303
+cpu MHz		: 2500.000
+cache size	: 28160 KB
+physical id	: 0
+
+MEM Info
+MemTotal:       16266512 kB
+MemFree:        12945300 kB
+
+Storage Info
+Filesystem                                                        Size  Used Avail Use% Mounted on
+devtmpfs                                                          7.8G     0  7.8G   0% /dev
+tmpfs                                                             7.8G     0  7.8G   0% /dev/shm
+tmpfs                                                             7.8G   66M  7.7G   1% /run
+tmpfs                                                             7.8G     0  7.8G   0% /sys/fs/cgroup
+/dev/mapper/root_vg-root                                           32G  7.1G   25G  23% /
+/dev/mapper/root_vg-tmp                                           3.9G   33M  3.8G   1% /tmp
+/dev/mapper/root_vg-var                                           3.9G  2.6G  1.3G  67% /var
+/dev/sda1                                                         973M  194M  780M  20% /boot
+csc-na01.csc.calpoly.edu:/faculty0_qtree/dekhtyar                 7.3T  5.2T  2.1T  72% /home/dekhtyar
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_c/cspackma  3.5T  1.7T  1.9T  49% /home/cspackma
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3517609
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/2104202
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3704835
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_e/emunoz23  3.5T  1.7T  1.9T  49% /home/emunoz23
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3548068
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_j/jdelos07  3.5T  1.7T  1.9T  49% /home/jdelos07
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3762411
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3602373
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_b/bdaly01   3.5T  1.7T  1.9T  49% /home/bdaly01
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_j/jlope424  3.5T  1.7T  1.9T  49% /home/jlope424
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3662211
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_a/aggerard  3.5T  1.7T  1.9T  49% /home/aggerard
+csc-na01.csc.calpoly.edu:/faculty0_qtree/jplanck                  7.3T  5.2T  2.1T  72% /home/jplanck
+csc-na01.csc.calpoly.edu:/students2018/students2018/0_c/cvarga30  3.5T  1.7T  1.9T  49% /home/cvarga30
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3691593
+tmpfs                                                             1.6G     0  1.6G   0% /run/user/3630788
+
+Home Directory Contents Before
+total 12
+drwx------ 2 bdaly01 domain users 4096 Jan  7 19:08 SysInfo
+-rw------- 1 bdaly01 domain users 3066 Jan  7 19:07 systemInfo
+drwxr-x--- 2 bdaly01 domain users 4096 Jan  6 11:21 www
+
+Home Directory Contents After
+total 8
+drwx------ 2 bdaly01 domain users 4096 Jan  7 19:08 SysInfo
+drwxr-x--- 2 bdaly01 domain users 4096 Jan  6 11:21 www
