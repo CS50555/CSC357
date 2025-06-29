@@ -1,0 +1,48 @@
+## Motivation
+It is likely that to this point in our use of computers we have only initiated the creation of additional processes by specifying
+the program to run as a command to the shell, by double-clicking in a graphical user interface (a graphical shell, if you will),
+or by tapping an icon on a phone or tablet. Each of these methods for creating processes is useful and important as a user of a device,
+but for this lab we will begin our exploration of process creation from within our own programs.
+
+ 
+## Task 1: fork
+Write a program named f_test. This program must take a single integer, N, as a command-line argument. This program must fork a child process.
+The child must print the odd numbers from 1 to N (inclusive) and then exit(), while the parent prints the even numbers from 1 to N (inclusive).
+The parent process should properly wait for the child process to terminate.
+
+For the odd numbers, use “%d\n” as the format string for printf. For the even numbers, use “\t%d\n” as the format string for printf.
+
+Run the program with a large enough value for N to observe an interleaving in the output.
+
+ 
+
+## Task 2: odds and evens
+This task is done in prepration for the next; this task does not use fork.
+
+Write two C programs: odds and evens. Each of these programs must take a single integer, N, as a command-line argument.
+odds prints the odd numbers from 1 to N (inclusive).
+evens prints the even numbers from 1 to N (inclusive); formatting for evens and odds should be as in task 1.
+
+ 
+
+## Task 3: exec
+Write a program named fe_test. This program will behave similarly to the program from the first part, but will use one of the "exec"
+system calls to execute the programs written in the Task 2. The parent should fork two child processes. One child process will "exec" the odds program.
+The other will "exec" the evens program. The parent process should properly wait for both child processes to terminate but allow them to execute
+concurrently (i.e., wait after both children have been created).
+
+ 
+
+## Task 4: Redirection
+Write a program named to_file. This program will take two command-line arguments. The first is the name of another program and the second is the
+name of a file (which need not yet exist).
+
+Your program is going to use "exec" to run the specified program. Before doing so, however, your program will need to open the specified file and
+take the appropriate steps to redirect standard output to the specified file. This setup is done so that the exec’d program will write its output
+to the file.
+
+Recall discussions of file descriptions (including standard uses), open, and dup.
+
+## Demo & Submission
+
+After you finish the lab, create ONE compressed file containing all your files and submit it on CANVAS.
