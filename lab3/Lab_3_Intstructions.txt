@@ -1,0 +1,10 @@
+## Intro to C & GDB
+
+This lab is designed to get you started with C and practice with the GDB debugger
+
+
+## Demo & Submission
+
+After you finish the lab, create ONE compressed file containing all files & folders and submit it on CANVAS.
+AFTER you submit your file, you need to demonstrate your working program to the instructor before the deadline to get your grade.
+Non-demoed program won't receive points. It is your responsibility to find time during labs and office hours to demo your program.
